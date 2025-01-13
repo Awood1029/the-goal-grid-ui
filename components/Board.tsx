@@ -9,15 +9,11 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import Goal from "@/components/Goal";
-import type {
-	BoardDTO,
-	Goal as GoalType,
-	UpdateGoalDescriptionDTO,
-} from "@/types";
+import type { BoardDTO, Goal as GoalType, GoalUpdateDTO } from "@/types";
 
 interface BoardProps {
 	board: BoardDTO;
-	onUpdateGoals: (updates: UpdateGoalDescriptionDTO[]) => Promise<void>;
+	onUpdateGoals: (updates: GoalUpdateDTO[]) => Promise<void>;
 	onToggleComplete: (goalId: number, completed: boolean) => Promise<void>;
 	canEdit: boolean;
 }
@@ -41,17 +37,23 @@ const Board: React.FC<BoardProps> = ({
 	};
 
 	const handleSaveChanges = async () => {
-		const updates = Object.entries(pendingUpdates).map(
-			([goalId, description]) => ({
-				goalId: Number(goalId),
-				description,
-			})
-		);
-		if (updates.length > 0) {
-			await onUpdateGoals(updates);
+		try {
+			// Convert pendingUpdates to array of updates
+			const updates = board.goals
+				.filter((goal) => pendingUpdates[goal.id] !== undefined)
+				.map((goal) => ({
+					goalId: goal.id,
+					description: pendingUpdates[goal.id] ?? goal.description,
+				}));
+
+			if (updates.length > 0) {
+				await onUpdateGoals(updates);
+			}
+			setPendingUpdates({});
+			setEditMode(false);
+		} catch (error) {
+			console.error("Failed to save goal updates:", error);
 		}
-		setPendingUpdates({});
-		setEditMode(false);
 	};
 
 	const handleCellClick = (goal: GoalType) => {
@@ -71,10 +73,20 @@ const Board: React.FC<BoardProps> = ({
 		}
 	};
 
-	const handleToggleComplete = async () => {
-		if (selectedGoal) {
-			await onToggleComplete(selectedGoal.id, !selectedGoal.completed);
+	const handleToggleComplete = async (goalId: number) => {
+		const goal = board.goals.find((g) => g.id === goalId);
+		if (!goal) return;
+
+		try {
+			await onUpdateGoals([
+				{
+					goalId,
+					completed: !goal.completed,
+				},
+			]);
 			setSelectedGoal(null);
+		} catch (error) {
+			console.error("Failed to toggle goal completion:", error);
 		}
 	};
 
@@ -181,7 +193,9 @@ const Board: React.FC<BoardProps> = ({
 								</div>
 								{canEdit && (
 									<Button
-										onClick={handleToggleComplete}
+										onClick={() =>
+											selectedGoal && handleToggleComplete(selectedGoal.id)
+										}
 										className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
 									>
 										{selectedGoal?.completed

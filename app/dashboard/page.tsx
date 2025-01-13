@@ -7,7 +7,7 @@ import Board from "@/components/Board";
 import Loading from "@/components/Loading";
 import CreateBoardDialog from "@/dialogs/CreateBoardDialog";
 import RenameBoardDialog from "@/dialogs/RenameBoardDialog";
-import { UpdateGoalDescriptionDTO } from "@/types";
+import { GoalUpdateDTO } from "@/types";
 
 export default function DashboardPage() {
 	const { user } = useAuth();
@@ -33,12 +33,21 @@ export default function DashboardPage() {
 		}
 	};
 
-	const handleUpdateGoals = async (updates: UpdateGoalDescriptionDTO[]) => {
-		if (!board) return; // Ensure the board is loaded
+	const handleUpdateGoals = async (updates: GoalUpdateDTO[]) => {
+		if (!board) return;
 		try {
-			await updateGoals(board.id, updates); // Pass boardId and updates
+			await updateGoals(board.id, updates);
 		} catch (err) {
 			console.error("Failed to update goals:", err);
+		}
+	};
+
+	const handleToggleComplete = async (goalId: number, completed: boolean) => {
+		if (!board) return;
+		try {
+			await updateGoals(board.id, [{ goalId, completed }]);
+		} catch (err) {
+			console.error("Failed to toggle goal completion:", err);
 		}
 	};
 
@@ -60,7 +69,8 @@ export default function DashboardPage() {
 				) : (
 					<Board
 						board={board}
-						onUpdateGoals={handleUpdateGoals} // Pass the new function
+						onUpdateGoals={handleUpdateGoals}
+						onToggleComplete={handleToggleComplete}
 						canEdit={true}
 					/>
 				)}

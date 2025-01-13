@@ -1,5 +1,5 @@
 import apiClient from "./apiClient"; // Axios instance with base URL
-import type { BoardDTO, GoalDTO, UpdateGoalDescriptionDTO } from "@/types";
+import type { BoardDTO, GoalDTO, GoalUpdateDTO } from "@/types";
 
 export const boardService = {
 	/**
@@ -32,7 +32,7 @@ export const boardService = {
 	 */
 	bulkUpdateGoals: async (
 		boardId: number,
-		goalUpdates: UpdateGoalDescriptionDTO[]
+		goalUpdates: GoalUpdateDTO[]
 	): Promise<BoardDTO> => {
 		const response = await apiClient.put(
 			`/boards/${boardId}/goals`,

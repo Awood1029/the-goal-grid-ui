@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { boardService } from "@/services/boardService";
-import type { BoardDTO, UpdateGoalDescriptionDTO } from "@/types";
+import type { BoardDTO, GoalUpdateDTO } from "@/types";
 
 export function useBoard() {
 	const [board, setBoard] = useState<BoardDTO | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const handleError = (err: any) => {
+	const handleError = (err: unknown) => {
 		console.error("Board Error:", err);
-		setError(err?.message || "An unexpected error occurred");
+		setError(
+			err instanceof Error ? err.message : "An unexpected error occurred"
+		);
 	};
 
 	const getBoard = async () => {
@@ -51,10 +53,7 @@ export function useBoard() {
 		}
 	};
 
-	const updateGoals = async (
-		boardId: number,
-		updates: UpdateGoalDescriptionDTO[]
-	) => {
+	const updateGoals = async (boardId: number, updates: GoalUpdateDTO[]) => {
 		setIsLoading(true);
 		setError(null);
 		try {

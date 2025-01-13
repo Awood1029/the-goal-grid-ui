@@ -1,7 +1,6 @@
 import React from "react";
 import { Star } from "lucide-react";
 import type { Goal as GoalType } from "@/types";
-import { Button } from "./ui/button";
 
 interface GoalProps {
 	goal: GoalType;
@@ -18,7 +17,6 @@ const Goal: React.FC<GoalProps> = ({
 }) => {
 	return (
 		<div
-			onClick={onClick}
 			className={`aspect-square p-1 sm:p-2 rounded-lg cursor-pointer flex items-center justify-center text-center
         transition-all duration-300 relative overflow-hidden ${
 					goal.completed
@@ -26,11 +24,26 @@ const Goal: React.FC<GoalProps> = ({
 						: "bg-white hover:shadow-lg border border-gray-200"
 				}`}
 		>
-			<div className="w-full h-full flex items-center justify-center text-xs sm:text-sm overflow-hidden">
+			<div
+				onClick={onClick}
+				className="w-full h-full flex items-center justify-center text-xs sm:text-sm overflow-hidden"
+			>
 				<span className="line-clamp-3">{goal.description}</span>
 			</div>
-			{goal.completed && (
-				<Star className="absolute top-0.5 right-0.5 h-2 w-2 sm:h-3 sm:w-3 text-yellow-500" />
+			{!editMode && (
+				<button
+					onClick={(e) => {
+						e.stopPropagation();
+						onToggleComplete(goal.id, !goal.completed);
+					}}
+					className="absolute top-0.5 right-0.5 p-0.5 rounded-full hover:bg-gray-100"
+				>
+					<Star
+						className={`h-2 w-2 sm:h-3 sm:w-3 ${
+							goal.completed ? "text-yellow-500" : "text-gray-300"
+						}`}
+					/>
+				</button>
 			)}
 		</div>
 	);

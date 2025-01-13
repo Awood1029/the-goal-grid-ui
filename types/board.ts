@@ -11,17 +11,10 @@ export interface UpdateGoalCompletionDTO {
 	completed: boolean;
 }
 
-export interface UpdateGoalDescriptionDTO {
-	id: number;
-	completed: boolean;
-}
-
-export interface GoalDTO {
-	id: number;
-	description: string;
-	position: number;
-	boardId: number;
-	completed: boolean;
+export interface GoalUpdateDTO {
+	goalId: number;
+	description?: string;
+	completed?: boolean;
 }
 
 export interface BoardDTO {
@@ -35,10 +28,6 @@ export interface CreateBoardRequestDTO {
 	boardName: string;
 }
 
-export interface Board extends BoardDTO {
-	// Additional frontend fields if needed
-}
-
-export interface Goal extends GoalDTO {
-	// Additional frontend fields if needed
-}
+// Using type aliases instead of empty interfaces
+export type Board = BoardDTO;
+export type Goal = GoalDTO;
