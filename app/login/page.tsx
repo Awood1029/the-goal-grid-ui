@@ -19,9 +19,14 @@ export default function LoginPage() {
 		e.preventDefault();
 
 		try {
-			const result = await login(formData); // Call the useLogin hook's login function
-			updateAuthContext(result.token, { username: result.username }); // Update AuthContext
-			router.push("/dashboard"); // Redirect on successful login
+			const result = await login(formData);
+			updateAuthContext(result.token, {
+				userId: result.userId,
+				username: result.username,
+				firstName: result.firstName,
+				lastName: result.lastName,
+			});
+			router.push("/dashboard");
 		} catch (err) {
 			console.error("Login failed:", err);
 		}

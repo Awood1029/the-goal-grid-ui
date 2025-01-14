@@ -1,18 +1,21 @@
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from "react";
+import type { AuthResponseDTO } from "@/types";
 
 interface AuthContextType {
-	user: { username: string } | null;
+	user: Omit<AuthResponseDTO, "token"> | null;
 	token: string | null;
-	login: (token: string, user: { username: string }) => void;
+	login: (token: string, user: Omit<AuthResponseDTO, "token">) => void;
 	logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+	undefined
+);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [user, setUser] = useState<{ username: string } | null>(null);
+	const [user, setUser] = useState<Omit<AuthResponseDTO, "token"> | null>(null);
 	const [token, setToken] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -24,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		}
 	}, []);
 
-	const login = (token: string, user: { username: string }) => {
+	const login = (token: string, user: Omit<AuthResponseDTO, "token">) => {
 		localStorage.setItem("token", token);
 		localStorage.setItem("user", JSON.stringify(user));
 		setToken(token);

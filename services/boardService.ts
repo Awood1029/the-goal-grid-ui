@@ -1,7 +1,21 @@
 import apiClient from "./apiClient"; // Axios instance with base URL
-import type { BoardDTO, GoalDTO, GoalUpdateDTO } from "@/types";
+import type {
+	BoardDTO,
+	GoalDTO,
+	GoalUpdateDTO,
+	CreateBoardRequestDTO,
+} from "@/types";
 
 export const boardService = {
+	/**
+	 * Create a new board with the given name
+	 * @param boardName - Name for the new board
+	 */
+	createBoard: async (boardName: string): Promise<BoardDTO> => {
+		const response = await apiClient.post("/api/boards", { boardName });
+		return response.data;
+	},
+
 	/**
 	 * Get or create the personal board for the current user.
 	 */
