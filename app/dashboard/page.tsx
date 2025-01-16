@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useBoard } from "@/hooks/board/useBoard";
 import Board from "@/components/Board";
@@ -18,13 +18,7 @@ export default function DashboardPage() {
 	const [showCreateBoardDialog, setShowCreateBoardDialog] = useState(false);
 	const [showRenameBoardDialog, setShowRenameBoardDialog] = useState(false);
 
-	useEffect(() => {
-		if (user) {
-			loadBoard();
-		}
-	}, [user]);
-
-	const loadBoard = async () => {
+	const loadBoard = useCallback(async () => {
 		try {
 			setLoading(true);
 			await getBoard();
@@ -33,7 +27,13 @@ export default function DashboardPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [getBoard]);
+
+	useEffect(() => {
+		if (user) {
+			loadBoard();
+		}
+	}, [user, loadBoard]);
 
 	const handleUpdateGoals = async (updates: GoalUpdateDTO[]) => {
 		if (!board) return;

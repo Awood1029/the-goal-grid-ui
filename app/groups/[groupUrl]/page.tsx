@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,19 +33,7 @@ export default function GroupPage() {
 
 	const groupUrl = typeof params?.groupUrl === "string" ? params.groupUrl : "";
 
-	useEffect(() => {
-		if (groupUrl) {
-			loadGroupData();
-		}
-	}, [groupUrl]);
-
-	useEffect(() => {
-		if (user?.userId && !selectedUserId) {
-			setSelectedUserId(user.userId);
-		}
-	}, [user]);
-
-	const loadGroupData = async () => {
+	const loadGroupData = useCallback(async () => {
 		try {
 			const [group, boards] = await Promise.all([
 				groupService.getGroupByUrl(groupUrl),
@@ -58,7 +46,19 @@ export default function GroupPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [groupUrl]);
+
+	useEffect(() => {
+		if (groupUrl) {
+			loadGroupData();
+		}
+	}, [groupUrl, loadGroupData]);
+
+	useEffect(() => {
+		if (user?.userId && !selectedUserId) {
+			setSelectedUserId(user.userId);
+		}
+	}, [user, selectedUserId]);
 
 	const handleUpdateGoals = async (updates: GoalUpdateDTO[]) => {
 		try {
