@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 interface LoginData {
 	username: string;
@@ -14,27 +15,37 @@ export default function useLogin() {
 		setError(null);
 
 		try {
-			console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
-
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(data),
+					credentials: "include", // This is important for cookies
 				}
 			);
 
 			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(errorText || "Login failed");
+				const errorData = await response.json().catch(() => null);
+				throw new Error(errorData?.message || "Invalid username or password");
 			}
 
 			const result = await response.json();
-			localStorage.setItem("token", result.token); // Save the JWT token
+
+			// Store token in both localStorage and cookies
+			localStorage.setItem("token", result.token);
+			Cookies.set("token", result.token, {
+				expires: 7, // 7 days
+				sameSite: "Lax",
+				secure: process.env.NODE_ENV === "production",
+			});
+
 			return result;
-		} catch (err: any) {
-			setError(err.message || "An unexpected error occurred");
+		} catch (err: unknown) {
+			console.error("Login error:", err);
+			const errorMessage =
+				err instanceof Error ? err.message : "An unexpected error occurred";
+			setError(errorMessage);
 			throw err;
 		} finally {
 			setIsSubmitting(false);

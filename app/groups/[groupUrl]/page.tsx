@@ -192,20 +192,22 @@ export default function GroupPage() {
 						/>
 
 						{displayedBoard ? (
-							<Card className="p-4 sm:p-6">
-								<h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
-									{
-										currentGroup.users.find((u) => u.id === selectedUserId)
-											?.firstName
-									}
-									&apos;s Board
-								</h2>
-								<Board
-									board={displayedBoard}
-									onUpdateGoals={handleUpdateGoals}
-									onToggleComplete={handleToggleComplete}
-									canEdit={user?.userId === selectedUserId}
-								/>
+							<Card className="p-4 sm:p-6 relative overflow-hidden">
+								<div className="relative">
+									<h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900">
+										{
+											currentGroup.users.find((u) => u.id === selectedUserId)
+												?.firstName
+										}
+										&apos;s Board
+									</h2>
+									<Board
+										board={displayedBoard}
+										onUpdateGoals={handleUpdateGoals}
+										onToggleComplete={handleToggleComplete}
+										canEdit={user?.userId === selectedUserId}
+									/>
+								</div>
 							</Card>
 						) : (
 							!hasUserBoard &&
