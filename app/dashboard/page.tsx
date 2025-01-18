@@ -16,18 +16,14 @@ export default function DashboardPage() {
 	const { user, isInitialized } = useAuth();
 	const router = useRouter();
 	const { board, getBoard, createBoard, renameBoard, updateGoals } = useBoard();
-	const [loading, setLoading] = useState(true);
 	const [showCreateBoardDialog, setShowCreateBoardDialog] = useState(false);
 	const [showRenameBoardDialog, setShowRenameBoardDialog] = useState(false);
 
 	const loadBoard = useCallback(async () => {
 		try {
-			setLoading(true);
 			await getBoard();
 		} catch (err) {
 			console.error("Failed to load board:", err);
-		} finally {
-			setLoading(false);
 		}
 	}, [getBoard]);
 
