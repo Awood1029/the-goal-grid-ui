@@ -43,20 +43,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const login = async (token: string, user: Omit<AuthResponseDTO, "token">) => {
-		localStorage.setItem("token", token);
-		localStorage.setItem("user", JSON.stringify(user));
-		Cookies.set("token", token, {
-			expires: 7,
-			sameSite: "Lax",
-			secure: process.env.NODE_ENV === "production",
-			path: "/",
-		});
-		setToken(token);
-		setUser(user);
 		try {
-			await router.replace("/dashboard");
+			// First set the auth state
+			setToken(token);
+			setUser(user);
+
+			// Then store in persistent storage
+			localStorage.setItem("token", token);
+			localStorage.setItem("user", JSON.stringify(user));
+
+			// Set cookie with proper configuration
+			Cookies.set("token", token, {
+				expires: 7,
+				sameSite: "Lax",
+				secure: process.env.NODE_ENV === "production",
+				path: "/",
+			});
+
+			// Force a hard navigation to dashboard
+			window.location.href = "/dashboard";
 		} catch (err) {
-			console.error("Navigation error:", err);
+			console.error("Login error:", err);
+			// If there's an error, clear everything
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+			Cookies.remove("token");
+			setToken(null);
+			setUser(null);
 		}
 	};
 

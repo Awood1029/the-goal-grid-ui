@@ -83,32 +83,34 @@ export default function Navbar() {
 
 					{/* Desktop menu */}
 					<div className="hidden md:flex items-center space-x-6">
-						<Link
-							href="/dashboard"
-							className="text-gray-600 hover:text-purple-600 transition-colors"
-						>
-							Dashboard
-						</Link>
-						<Link
-							href="/groups"
-							className="text-gray-600 hover:text-purple-600 transition-colors"
-						>
-							Groups
-						</Link>
-						{!user ? (
+						{user ? (
+							<>
+								<Link
+									href="/dashboard"
+									className="text-gray-600 hover:text-purple-600 transition-colors"
+								>
+									Dashboard
+								</Link>
+								<Link
+									href="/groups"
+									className="text-gray-600 hover:text-purple-600 transition-colors"
+								>
+									Groups
+								</Link>
+								<button
+									onClick={handleLogout}
+									className="text-gray-600 hover:text-purple-600 transition-colors focus:outline-none"
+								>
+									Logout
+								</button>
+							</>
+						) : (
 							<Link
 								href="/login"
 								className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
 							>
 								Login
 							</Link>
-						) : (
-							<button
-								onClick={handleLogout}
-								className="text-gray-600 hover:text-purple-600 transition-colors focus:outline-none"
-							>
-								Logout
-							</button>
 						)}
 					</div>
 				</div>
@@ -116,21 +118,30 @@ export default function Navbar() {
 				{/* Mobile menu */}
 				<div className={`${isOpen ? "block" : "hidden"} md:hidden`}>
 					<div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-						<Link
-							href="/dashboard"
-							className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
-							onClick={() => setIsOpen(false)}
-						>
-							Dashboard
-						</Link>
-						<Link
-							href="/groups"
-							className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
-							onClick={() => setIsOpen(false)}
-						>
-							Groups
-						</Link>
-						{!user ? (
+						{user ? (
+							<>
+								<Link
+									href="/dashboard"
+									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
+									onClick={() => setIsOpen(false)}
+								>
+									Dashboard
+								</Link>
+								<Link
+									href="/groups"
+									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
+									onClick={() => setIsOpen(false)}
+								>
+									Groups
+								</Link>
+								<button
+									onClick={handleLogout}
+									className="block w-full text-left px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors focus:outline-none"
+								>
+									Logout
+								</button>
+							</>
+						) : (
 							<Link
 								href="/login"
 								className="block px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 transition-opacity"
@@ -138,13 +149,6 @@ export default function Navbar() {
 							>
 								Login
 							</Link>
-						) : (
-							<button
-								onClick={handleLogout}
-								className="block w-full text-left px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors focus:outline-none"
-							>
-								Logout
-							</button>
 						)}
 					</div>
 				</div>
