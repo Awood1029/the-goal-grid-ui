@@ -17,7 +17,7 @@ export default function LoginPage() {
 	// Redirect if already logged in
 	useEffect(() => {
 		if (user) {
-			router.push("/dashboard");
+			router.replace("/dashboard");
 		}
 	}, [user, router]);
 
@@ -37,14 +37,13 @@ export default function LoginPage() {
 
 		try {
 			const result = await login(formData);
-			if (result && result.token) {
-				updateAuthContext(result.token, {
+			if (result?.token) {
+				await updateAuthContext(result.token, {
 					userId: result.userId,
 					username: result.username,
 					firstName: result.firstName,
 					lastName: result.lastName,
 				});
-				router.push("/dashboard");
 			} else {
 				setLocalError("Invalid login response");
 			}

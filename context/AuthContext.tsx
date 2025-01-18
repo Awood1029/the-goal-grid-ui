@@ -10,6 +10,7 @@ interface AuthContextType {
 	token: string | null;
 	login: (token: string, user: Omit<AuthResponseDTO, "token">) => void;
 	logout: () => void;
+	isInitialized: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -19,6 +20,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<Omit<AuthResponseDTO, "token"> | null>(null);
 	const [token, setToken] = useState<string | null>(null);
+	const [isInitialized, setIsInitialized] = useState(false);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -28,28 +30,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			setToken(storedToken);
 			setUser(JSON.parse(storedUser));
 
-			// Ensure cookie is set if we got token from localStorage
 			if (!Cookies.get("token")) {
 				Cookies.set("token", storedToken, {
 					expires: 7,
 					sameSite: "Lax",
 					secure: process.env.NODE_ENV === "production",
+					path: "/",
 				});
 			}
 		}
+		setIsInitialized(true);
 	}, []);
 
-	const login = (token: string, user: Omit<AuthResponseDTO, "token">) => {
-		// Set in both localStorage and cookies
+	const login = async (token: string, user: Omit<AuthResponseDTO, "token">) => {
 		localStorage.setItem("token", token);
 		localStorage.setItem("user", JSON.stringify(user));
 		Cookies.set("token", token, {
-			expires: 7, // 7 days
+			expires: 7,
 			sameSite: "Lax",
 			secure: process.env.NODE_ENV === "production",
+			path: "/",
 		});
 		setToken(token);
 		setUser(user);
+		await router.push("/dashboard");
 	};
 
 	const logout = () => {
@@ -62,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, token, login, logout }}>
+		<AuthContext.Provider value={{ user, token, login, logout, isInitialized }}>
 			{children}
 		</AuthContext.Provider>
 	);

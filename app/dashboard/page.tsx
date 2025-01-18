@@ -10,9 +10,11 @@ import RenameBoardDialog from "@/dialogs/RenameBoardDialog";
 import { GoalUpdateDTO } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Target, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-	const { user } = useAuth();
+	const { user, isInitialized } = useAuth();
+	const router = useRouter();
 	const { board, getBoard, createBoard, renameBoard, updateGoals } = useBoard();
 	const [loading, setLoading] = useState(true);
 	const [showCreateBoardDialog, setShowCreateBoardDialog] = useState(false);
@@ -28,6 +30,12 @@ export default function DashboardPage() {
 			setLoading(false);
 		}
 	}, [getBoard]);
+
+	useEffect(() => {
+		if (isInitialized && !user) {
+			router.replace("/login");
+		}
+	}, [isInitialized, user, router]);
 
 	useEffect(() => {
 		if (user) {
@@ -61,7 +69,9 @@ export default function DashboardPage() {
 		return { completed, total, percentage };
 	};
 
-	if (loading) return <Loading />;
+	if (!isInitialized || !user) {
+		return <Loading />;
+	}
 
 	const stats = getCompletionStats();
 	const timeOfDay = new Date().getHours();
