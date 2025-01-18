@@ -34,10 +34,10 @@ export default function DashboardPage() {
 	}, [isInitialized, user, router]);
 
 	useEffect(() => {
-		if (user) {
+		if (isInitialized && user) {
 			loadBoard();
 		}
-	}, [user, loadBoard]);
+	}, [isInitialized, user, loadBoard]);
 
 	const handleUpdateGoals = async (updates: GoalUpdateDTO[]) => {
 		if (!board) return;
