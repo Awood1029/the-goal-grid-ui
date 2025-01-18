@@ -53,7 +53,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		});
 		setToken(token);
 		setUser(user);
-		await router.push("/dashboard");
+		try {
+			await router.replace("/dashboard");
+		} catch (err) {
+			console.error("Navigation error:", err);
+		}
 	};
 
 	const logout = () => {

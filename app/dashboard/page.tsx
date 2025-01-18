@@ -18,14 +18,17 @@ export default function DashboardPage() {
 	const { board, getBoard, createBoard, renameBoard, updateGoals } = useBoard();
 	const [showCreateBoardDialog, setShowCreateBoardDialog] = useState(false);
 	const [showRenameBoardDialog, setShowRenameBoardDialog] = useState(false);
+	const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
 
 	const loadBoard = useCallback(async () => {
+		if (hasAttemptedLoad) return;
 		try {
+			setHasAttemptedLoad(true);
 			await getBoard();
 		} catch (err) {
 			console.error("Failed to load board:", err);
 		}
-	}, [getBoard]);
+	}, [getBoard, hasAttemptedLoad]);
 
 	useEffect(() => {
 		if (isInitialized && !user) {
@@ -34,10 +37,10 @@ export default function DashboardPage() {
 	}, [isInitialized, user, router]);
 
 	useEffect(() => {
-		if (isInitialized && user) {
+		if (isInitialized && user && !hasAttemptedLoad) {
 			loadBoard();
 		}
-	}, [isInitialized, user, loadBoard]);
+	}, [isInitialized, user, loadBoard, hasAttemptedLoad]);
 
 	const handleUpdateGoals = async (updates: GoalUpdateDTO[]) => {
 		if (!board) return;

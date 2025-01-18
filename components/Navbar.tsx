@@ -10,12 +10,20 @@ export default function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
 	const router = useRouter();
 
+	const handleNavigation = async (path: string) => {
+		try {
+			await router.replace(path);
+		} catch (err) {
+			console.error("Navigation error:", err);
+		}
+	};
+
 	const handleLogout = () => {
 		logout();
 		// Close mobile menu after logout
 		setIsOpen(false);
 		// Redirect to login page
-		router.push("/login");
+		handleNavigation("/login");
 	};
 
 	return (
