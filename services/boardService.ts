@@ -1,10 +1,5 @@
 import apiClient from "./apiClient"; // Axios instance with base URL
-import type {
-	BoardDTO,
-	GoalDTO,
-	GoalUpdateDTO,
-	CreateBoardRequestDTO,
-} from "@/types";
+import type { BoardDTO, GoalDTO, GoalUpdateDTO } from "@/types";
 
 export const boardService = {
 	/**
