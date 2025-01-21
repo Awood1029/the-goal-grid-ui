@@ -4,12 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import ModeToggle from "./ModeToggle";
 
 export default function Navbar() {
 	const { user, logout } = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
-	const [theme, setTheme] = useState("light");
 	const router = useRouter();
 
 	const handleNavigation = async (path: string) => {
@@ -87,7 +85,6 @@ export default function Navbar() {
 					<div className="hidden md:flex items-center space-x-6">
 						{user ? (
 							<>
-								<ModeToggle />
 								<Link
 									href="/dashboard"
 									className="text-gray-600 hover:text-purple-600 transition-colors"
