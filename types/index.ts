@@ -4,6 +4,7 @@ export * from "./board";
 export * from "./group";
 export * from "./leaderboard";
 export * from "./props";
+export * from "./social";
 
 export interface LeaderboardEntry {
 	userId: number;

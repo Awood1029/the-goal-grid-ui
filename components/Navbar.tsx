@@ -92,6 +92,12 @@ export default function Navbar() {
 									Dashboard
 								</Link>
 								<Link
+									href="/feed"
+									className="text-gray-600 hover:text-purple-600 transition-colors"
+								>
+									Feed
+								</Link>
+								<Link
 									href="/groups"
 									className="text-gray-600 hover:text-purple-600 transition-colors"
 								>
@@ -126,6 +132,13 @@ export default function Navbar() {
 									onClick={() => setIsOpen(false)}
 								>
 									Dashboard
+								</Link>
+								<Link
+									href="/feed"
+									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
+									onClick={() => setIsOpen(false)}
+								>
+									Feed
 								</Link>
 								<Link
 									href="/groups"
