@@ -193,4 +193,18 @@ export const socialService = {
 			throw handleApiError(error);
 		}
 	},
+
+	updateComment: async (
+		commentId: number,
+		content: string
+	): Promise<CommentDTO> => {
+		try {
+			const response = await apiClient.put(`/comments/${commentId}`, {
+				content,
+			});
+			return response.data;
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
 };

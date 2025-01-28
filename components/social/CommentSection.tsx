@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
 	MessageCircle,
 	ChevronDown,
 	ChevronUp,
 	MoreVertical,
 	Trash2,
+	Pencil,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { CommentDTO, PostDTO, SocialError } from "@/types";
@@ -27,6 +29,11 @@ interface CommentSectionProps {
 	currentUserId?: number;
 }
 
+interface EditingComment {
+	id: number;
+	content: string;
+}
+
 export const CommentSection: React.FC<CommentSectionProps> = ({
 	post,
 	onCommentAdded,
@@ -38,6 +45,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 	const [showComments, setShowComments] = useState(false);
 	const [isLoadingComments, setIsLoadingComments] = useState(false);
 	const [comments, setComments] = useState<CommentDTO[]>([]);
+	const [editingComment, setEditingComment] = useState<EditingComment | null>(
+		null
+	);
 	const { toast } = useToast();
 
 	const loadComments = async () => {
@@ -124,6 +134,47 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 		}
 	};
 
+	const handleEditComment = async (commentId: number) => {
+		if (!editingComment) return;
+
+		try {
+			const updatedComment = await socialService.updateComment(
+				commentId,
+				editingComment.content
+			);
+
+			// Update comments list
+			setComments((prev) =>
+				prev.map((c) => (c.id === commentId ? updatedComment : c))
+			);
+
+			setEditingComment(null);
+			toast({
+				description: "Comment updated successfully",
+			});
+		} catch (error: unknown) {
+			console.error("Error updating comment:", error);
+			const socialError = error as SocialError;
+
+			toast({
+				title: "Error",
+				description: socialError.message || "Failed to update comment",
+				variant: "destructive",
+			});
+		}
+	};
+
+	const startEditing = (comment: CommentDTO) => {
+		setEditingComment({
+			id: comment.id,
+			content: comment.content,
+		});
+	};
+
+	const cancelEditing = () => {
+		setEditingComment(null);
+	};
+
 	return (
 		<div className={cn("w-full", className)}>
 			<div className="w-full">
@@ -161,6 +212,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 									: comment.authorId.username || "Unknown User";
 
 							const isCommentAuthor = currentUserId === comment.authorId.id;
+							const isEditing = editingComment?.id === comment.id;
 
 							return (
 								<div
@@ -176,7 +228,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 												})}
 											</span>
 										</div>
-										{isCommentAuthor && (
+										{isCommentAuthor && !isEditing && (
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
 													<Button
@@ -189,6 +241,12 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 												</DropdownMenuTrigger>
 												<DropdownMenuContent align="end">
 													<DropdownMenuItem
+														onClick={() => startEditing(comment)}
+													>
+														<Pencil className="h-4 w-4 mr-2" />
+														Edit
+													</DropdownMenuItem>
+													<DropdownMenuItem
 														className="text-red-600"
 														onClick={() => handleDeleteComment(comment.id)}
 													>
@@ -199,7 +257,37 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 											</DropdownMenu>
 										)}
 									</div>
-									<p className="text-sm">{comment.content}</p>
+									{isEditing ? (
+										<div className="space-y-2">
+											<Textarea
+												value={editingComment.content}
+												onChange={(e) =>
+													setEditingComment({
+														...editingComment,
+														content: e.target.value,
+													})
+												}
+												className="min-h-[60px]"
+											/>
+											<div className="flex justify-end gap-2">
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={cancelEditing}
+												>
+													Cancel
+												</Button>
+												<Button
+													size="sm"
+													onClick={() => handleEditComment(comment.id)}
+												>
+													Save
+												</Button>
+											</div>
+										</div>
+									) : (
+										<p className="text-sm">{comment.content}</p>
+									)}
 								</div>
 							);
 						})}
