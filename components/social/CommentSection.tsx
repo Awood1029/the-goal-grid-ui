@@ -1,28 +1,44 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import {
+	MessageCircle,
+	ChevronDown,
+	ChevronUp,
+	MoreVertical,
+	Trash2,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { CommentDTO, PostDTO } from "@/types";
+import type { CommentDTO, PostDTO, SocialError } from "@/types";
 import { socialService } from "@/services/socialService";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CommentSectionProps {
 	post: PostDTO;
 	onCommentAdded: (updatedPost: PostDTO) => void;
 	className?: string;
+	currentUserId?: number;
 }
 
 export const CommentSection: React.FC<CommentSectionProps> = ({
 	post,
 	onCommentAdded,
 	className,
+	currentUserId,
 }) => {
 	const [newComment, setNewComment] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showComments, setShowComments] = useState(false);
 	const [isLoadingComments, setIsLoadingComments] = useState(false);
 	const [comments, setComments] = useState<CommentDTO[]>([]);
+	const { toast } = useToast();
 
 	const loadComments = async () => {
 		if (!showComments) {
@@ -34,6 +50,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 				setComments(loadedComments);
 			} catch (error) {
 				console.error("Error loading comments:", error);
+				toast({
+					title: "Error",
+					description: "Failed to load comments",
+					variant: "destructive",
+				});
 			} finally {
 				setIsLoadingComments(false);
 			}
@@ -58,10 +79,48 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 				commentCount: (post.commentCount || 0) + 1,
 			};
 			onCommentAdded(updatedPost);
+
+			toast({
+				description: "Comment added successfully",
+			});
 		} catch (error) {
 			console.error("Error adding comment:", error);
+			toast({
+				title: "Error",
+				description: "Failed to add comment",
+				variant: "destructive",
+			});
 		} finally {
 			setIsSubmitting(false);
+		}
+	};
+
+	const handleDeleteComment = async (commentId: number) => {
+		try {
+			await socialService.deleteComment(commentId);
+
+			// Update local comments list
+			setComments((prev) => prev.filter((c) => c.id !== commentId));
+
+			// Update post comment count
+			const updatedPost = {
+				...post,
+				commentCount: Math.max(0, (post.commentCount || 0) - 1),
+			};
+			onCommentAdded(updatedPost);
+
+			toast({
+				description: "Comment deleted successfully",
+			});
+		} catch (error: unknown) {
+			console.error("Error deleting comment:", error);
+			const socialError = error as SocialError;
+
+			toast({
+				title: "Error",
+				description: socialError.message || "Failed to delete comment",
+				variant: "destructive",
+			});
 		}
 	};
 
@@ -101,18 +160,44 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 									? `${comment.authorId.firstName} ${comment.authorId.lastName}`
 									: comment.authorId.username || "Unknown User";
 
+							const isCommentAuthor = currentUserId === comment.authorId.id;
+
 							return (
 								<div
 									key={comment.id}
 									className="bg-gray-50 p-3 rounded-lg w-full"
 								>
-									<div className="flex items-center gap-2 mb-1">
-										<span className="font-medium">{commentAuthorName}</span>
-										<span className="text-sm text-gray-500">
-											{formatDistanceToNow(new Date(comment.createdAt), {
-												addSuffix: true,
-											})}
-										</span>
+									<div className="flex items-center justify-between mb-1">
+										<div className="flex items-center gap-2">
+											<span className="font-medium">{commentAuthorName}</span>
+											<span className="text-sm text-gray-500">
+												{formatDistanceToNow(new Date(comment.createdAt), {
+													addSuffix: true,
+												})}
+											</span>
+										</div>
+										{isCommentAuthor && (
+											<DropdownMenu>
+												<DropdownMenuTrigger asChild>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 hover:bg-gray-100"
+													>
+														<MoreVertical className="h-4 w-4" />
+													</Button>
+												</DropdownMenuTrigger>
+												<DropdownMenuContent align="end">
+													<DropdownMenuItem
+														className="text-red-600"
+														onClick={() => handleDeleteComment(comment.id)}
+													>
+														<Trash2 className="h-4 w-4 mr-2" />
+														Delete
+													</DropdownMenuItem>
+												</DropdownMenuContent>
+											</DropdownMenu>
+										)}
 									</div>
 									<p className="text-sm">{comment.content}</p>
 								</div>

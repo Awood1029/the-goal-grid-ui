@@ -161,4 +161,36 @@ export const socialService = {
 			throw handleApiError(error);
 		}
 	},
+
+	updatePost: async (
+		postId: number,
+		content: string,
+		isProgressUpdate?: boolean
+	): Promise<PostDTO> => {
+		try {
+			const response = await apiClient.put(`/posts/${postId}`, {
+				content,
+				isProgressUpdate,
+			});
+			return response.data;
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
+
+	deletePost: async (postId: number): Promise<void> => {
+		try {
+			await apiClient.delete(`/posts/${postId}`);
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
+
+	deleteComment: async (commentId: number): Promise<void> => {
+		try {
+			await apiClient.delete(`/comments/${commentId}`);
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
 };

@@ -8,6 +8,7 @@ import type { FeedProps } from "@/types";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 export const Feed: React.FC<FeedProps> = ({
 	type,
@@ -21,6 +22,7 @@ export const Feed: React.FC<FeedProps> = ({
 		groupUniqueCode,
 		goalId,
 	});
+	const { user } = useAuth();
 
 	if (isLoading) {
 		return (
@@ -66,7 +68,10 @@ export const Feed: React.FC<FeedProps> = ({
 							post={post}
 							onCommentAdded={handleCommentAdded}
 							onReactionAdded={loadPosts}
+							onPostDeleted={loadPosts}
+							onPostUpdated={loadPosts}
 							referencedGoal={referencedGoal}
+							currentUserId={user?.userId}
 						/>
 					);
 				})}
