@@ -79,9 +79,21 @@ export const socialService = {
 		}
 	},
 
-	getAllCommentsForPost: async (postId: number): Promise<CommentDTO[]> => {
+	/**
+	 * Get all comments for a specific post.
+	 * @param postId - ID of the post
+	 * @param sortBy - Field to sort by (default: 'createdAt')
+	 * @param sortDir - Sort direction ('asc' or 'desc', default: 'asc')
+	 */
+	getAllCommentsForPost: async (
+		postId: number,
+		sortBy: string = "createdAt",
+		sortDir: string = "desc"
+	): Promise<CommentDTO[]> => {
 		try {
-			const response = await apiClient.get(`/posts/${postId}/comments`);
+			const response = await apiClient.get(`/posts/${postId}/comments`, {
+				params: { sortBy, sortDir },
+			});
 			return response.data;
 		} catch (error) {
 			throw handleApiError(error);
@@ -175,6 +187,42 @@ export const socialService = {
 				}
 			);
 			return response.data;
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
+
+	/**
+	 * Remove a reaction from a specific post.
+	 * @param postId - ID of the post
+	 * @param type - Type of the reaction to remove
+	 */
+	removeReactionFromPost: async (
+		postId: number,
+		type: string
+	): Promise<void> => {
+		try {
+			await apiClient.delete(`/posts/${postId}/reactions`, {
+				params: { type },
+			});
+		} catch (error) {
+			throw handleApiError(error);
+		}
+	},
+
+	/**
+	 * Remove a reaction from a specific comment.
+	 * @param commentId - ID of the comment
+	 * @param type - Type of the reaction to remove
+	 */
+	removeReactionFromComment: async (
+		commentId: number,
+		type: string
+	): Promise<void> => {
+		try {
+			await apiClient.delete(`/comments/${commentId}/reactions`, {
+				params: { type },
+			});
 		} catch (error) {
 			throw handleApiError(error);
 		}

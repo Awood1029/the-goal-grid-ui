@@ -4,14 +4,13 @@ import type { GoalDTO } from "./board";
 export enum ReactionType {
 	LIKE = "LIKE",
 	LOVE = "LOVE",
-	CELEBRATE = "CELEBRATE",
-	SUPPORT = "SUPPORT",
+	LAUGH = "LAUGH",
 }
 
 export interface ReactionDTO {
 	id: number;
 	type: ReactionType;
-	userId?: number;
+	user?: UserDTO;
 	createdAt?: string;
 }
 
@@ -73,5 +72,5 @@ export type SocialErrorType =
 export interface SocialError {
 	type: SocialErrorType;
 	message: string;
-	details?: Record<string, any>;
+	details?: Record<string, string | number | boolean | null | undefined>;
 }

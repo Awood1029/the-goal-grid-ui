@@ -10,13 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { ReactionType } from "@/types/social";
 import type { PostDTO, GoalDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import type { SocialError } from "@/types";
 import { cn } from "@/lib/utils";
-import { reactionIcons } from "@/lib/constants";
 import { CommentSection } from "./CommentSection";
+import { ReactionSection } from "./ReactionSection";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -29,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 interface PostCardProps {
 	post: PostDTO;
 	onCommentAdded?: (updatedPost: PostDTO) => void;
-	onReactionAdded?: () => void;
+	onReactionAdded?: (updatedPost: PostDTO) => void;
 	onPostDeleted?: (postId: number) => void;
 	onPostUpdated?: (updatedPost: PostDTO) => void;
 	className?: string;
@@ -57,20 +56,6 @@ export const PostCard: React.FC<PostCardProps> = ({
 		setLocalPost(post);
 		setEditContent(post.content);
 	}, [post]);
-
-	const handleReaction = async (type: ReactionType) => {
-		try {
-			await socialService.addReactionToPost(post.id, type);
-			onReactionAdded?.();
-		} catch (error) {
-			console.error("Error adding reaction:", error);
-			toast({
-				title: "Error",
-				description: "Failed to add reaction",
-				variant: "destructive",
-			});
-		}
-	};
 
 	const handleDelete = async () => {
 		try {
@@ -120,10 +105,6 @@ export const PostCard: React.FC<PostCardProps> = ({
 				variant: "destructive",
 			});
 		}
-	};
-
-	const getReactionCount = (type: ReactionType) => {
-		return localPost.reactions?.filter((r) => r.type === type).length || 0;
 	};
 
 	const authorName =
@@ -207,25 +188,38 @@ export const PostCard: React.FC<PostCardProps> = ({
 			</CardContent>
 			<CardFooter className="flex flex-col gap-4">
 				<div className="flex items-center gap-2 w-full">
-					{Object.entries(reactionIcons).map(([type, Icon]) => (
-						<Button
-							key={type}
-							variant="outline"
-							size="sm"
-							className="flex items-center gap-1"
-							onClick={() => handleReaction(type as ReactionType)}
-						>
-							<Icon className="h-4 w-4" />
-							<span>{getReactionCount(type as ReactionType)}</span>
-						</Button>
-					))}
+					<ReactionSection
+						reactions={localPost.reactions}
+						onReactionAdded={(updatedReactions) => {
+							const updatedPost = {
+								...localPost,
+								reactions: updatedReactions,
+							};
+							setLocalPost(updatedPost);
+							onReactionAdded?.(updatedPost);
+						}}
+						currentUserId={currentUserId}
+						entityId={localPost.id}
+						entityType="post"
+					/>
 				</div>
 
+				{/* Comment Section */}
 				<CommentSection
 					post={localPost}
 					onCommentAdded={(updatedPost) => {
-						setLocalPost(updatedPost);
+						setLocalPost((prev) => ({
+							...prev,
+							...updatedPost,
+							commentCount: (prev.commentCount || 0) + 1,
+						}));
 						onCommentAdded?.(updatedPost);
+					}}
+					onCommentDeleted={() => {
+						setLocalPost((prev) => ({
+							...prev,
+							commentCount: Math.max(0, (prev.commentCount || 0) - 1),
+						}));
 					}}
 					currentUserId={currentUserId}
 				/>

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { PostCard } from "./PostCard";
 import { CreatePostForm } from "./CreatePostForm";
 import { useFeed } from "@/hooks/useFeed";
-import type { FeedProps } from "@/types";
+import type { FeedProps, PostDTO } from "@/types";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ export const Feed: React.FC<FeedProps> = ({
 		goalId,
 	});
 	const { user } = useAuth();
-	const observerRef = useRef<IntersectionObserver>();
+	const observerRef = useRef<IntersectionObserver | null>(null);
 	const loadingRef = useRef<HTMLDivElement>(null);
 
 	const lastPostRef = useCallback(
@@ -62,6 +62,11 @@ export const Feed: React.FC<FeedProps> = ({
 			}
 		};
 	}, []);
+
+	const handlePostUpdated = (updatedPost: PostDTO) => {
+		// Update the feed state with the updated post
+		handleCommentAdded(updatedPost);
+	};
 
 	if (error) {
 		return (
@@ -100,9 +105,9 @@ export const Feed: React.FC<FeedProps> = ({
 							<PostCard
 								post={post}
 								onCommentAdded={handleCommentAdded}
-								onReactionAdded={() => loadPosts(0)}
+								onReactionAdded={handlePostUpdated}
 								onPostDeleted={() => loadPosts(0)}
-								onPostUpdated={() => loadPosts(0)}
+								onPostUpdated={handlePostUpdated}
 								referencedGoal={referencedGoal}
 								currentUserId={user?.userId}
 							/>
