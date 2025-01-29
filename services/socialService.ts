@@ -5,6 +5,7 @@ import type {
 	ReactionDTO,
 	SocialError,
 	SocialErrorType,
+	PaginatedResponse,
 } from "@/types";
 import { AxiosError } from "axios";
 
@@ -88,27 +89,44 @@ export const socialService = {
 	},
 
 	// Feed endpoints
-	getMainFeed: async (): Promise<PostDTO[]> => {
+	getMainFeed: async (
+		page: number = 0,
+		size: number = 20
+	): Promise<PaginatedResponse<PostDTO>> => {
 		try {
-			const response = await apiClient.get("/feed/main");
+			const response = await apiClient.get(
+				`/feed/main?page=${page}&size=${size}`
+			);
 			return response.data;
 		} catch (error) {
 			throw handleApiError(error);
 		}
 	},
 
-	getGroupFeed: async (groupUniqueCode: string): Promise<PostDTO[]> => {
+	getGroupFeed: async (
+		groupUniqueCode: string,
+		page: number = 0,
+		size: number = 20
+	): Promise<PaginatedResponse<PostDTO>> => {
 		try {
-			const response = await apiClient.get(`/feed/group/${groupUniqueCode}`);
+			const response = await apiClient.get(
+				`/feed/group/${groupUniqueCode}?page=${page}&size=${size}`
+			);
 			return response.data;
 		} catch (error) {
 			throw handleApiError(error);
 		}
 	},
 
-	getGoalFeed: async (goalId: number): Promise<PostDTO[]> => {
+	getGoalFeed: async (
+		goalId: number,
+		page: number = 0,
+		size: number = 20
+	): Promise<PaginatedResponse<PostDTO>> => {
 		try {
-			const response = await apiClient.get(`/feed/goal/${goalId}`);
+			const response = await apiClient.get(
+				`/feed/goal/${goalId}?page=${page}&size=${size}`
+			);
 			return response.data;
 		} catch (error) {
 			throw handleApiError(error);

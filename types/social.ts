@@ -45,10 +45,21 @@ export interface FeedProps {
 	className?: string;
 }
 
+export interface PaginatedResponse<T> {
+	content: T[];
+	pageNumber: number;
+	pageSize: number;
+	totalElements: number;
+	totalPages: number;
+	last: boolean;
+}
+
 export interface FeedState {
 	posts: PostDTO[];
 	isLoading: boolean;
 	error: string | null;
+	hasMore: boolean;
+	currentPage: number;
 }
 
 export type SocialErrorType =
