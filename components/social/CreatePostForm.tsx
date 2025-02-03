@@ -85,50 +85,40 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 					</div>
 				)}
 				<Textarea
-					placeholder={
-						selectedGoal
-							? "Share your thoughts or progress about this goal..."
-							: "Select a goal first..."
-					}
 					value={content}
-					onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-						setContent(e.target.value)
-					}
-					className="min-h-[100px] resize-none"
-					disabled={!selectedGoal}
+					onChange={(e) => setContent(e.target.value)}
+					placeholder="What's on your mind?"
+					className="min-h-[100px] mb-4"
 				/>
-				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
+				<div className="flex flex-col sm:flex-row gap-4">
+					<div className="flex-1">
+						<Select value={selectedGoalId} onValueChange={setSelectedGoalId}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a goal" />
+							</SelectTrigger>
+							<SelectContent>
+								{goals.map((goal) => (
+									<SelectItem key={goal.id} value={goal.id.toString()}>
+										{goal.description}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 					<div className="flex items-center gap-2">
 						<Switch
 							id="progress-update"
 							checked={isProgressUpdate}
 							onCheckedChange={setIsProgressUpdate}
-							disabled={!selectedGoal}
 						/>
 						<Label
 							htmlFor="progress-update"
-							className="flex items-center gap-1 cursor-pointer"
+							className="flex items-center gap-1"
 						>
 							<Trophy className="h-4 w-4" />
 							Progress Update
 						</Label>
 					</div>
-					<Select
-						value={selectedGoalId}
-						onValueChange={setSelectedGoalId}
-						disabled={!!preselectedGoalId}
-					>
-						<SelectTrigger className="w-full sm:w-[250px]">
-							<SelectValue placeholder="Select a goal to post about" />
-						</SelectTrigger>
-						<SelectContent>
-							{goals.map((goal) => (
-								<SelectItem key={goal.id} value={goal.id.toString()}>
-									{goal.description}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
 				</div>
 			</CardContent>
 			<CardFooter>

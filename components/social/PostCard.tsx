@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { PostDTO, GoalDTO } from "@/types";
+import type { PostDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import type { SocialError } from "@/types";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,6 @@ interface PostCardProps {
 	onPostDeleted?: (postId: number) => void;
 	onPostUpdated?: (updatedPost: PostDTO) => void;
 	className?: string;
-	referencedGoal?: GoalDTO;
 	currentUserId?: number;
 }
 
@@ -43,7 +42,6 @@ export const PostCard: React.FC<PostCardProps> = ({
 	onPostDeleted,
 	onPostUpdated,
 	className,
-	referencedGoal,
 	currentUserId,
 }) => {
 	const [localPost, setLocalPost] = useState(post);
@@ -157,14 +155,14 @@ export const PostCard: React.FC<PostCardProps> = ({
 				)}
 			</CardHeader>
 			<CardContent>
-				{referencedGoal && (
+				{localPost.referencedGoal && (
 					<div className="mb-4 p-3 bg-purple-50 border border-purple-100 rounded-lg">
 						<div className="flex items-center gap-2 text-sm text-purple-700 mb-1">
 							<Target className="h-4 w-4" />
 							<span className="font-medium">Referenced Goal</span>
 						</div>
 						<p className="text-sm text-purple-900">
-							{referencedGoal.description}
+							{localPost.referencedGoal.referencedGoalContent}
 						</p>
 					</div>
 				)}

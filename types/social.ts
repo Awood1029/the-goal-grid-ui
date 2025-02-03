@@ -5,6 +5,7 @@ export enum ReactionType {
 	LIKE = "LIKE",
 	LOVE = "LOVE",
 	LAUGH = "LAUGH",
+	CELEBRATE = "CELEBRATE",
 }
 
 export interface ReactionDTO {
@@ -23,12 +24,17 @@ export interface CommentDTO {
 	reactions: ReactionDTO[];
 }
 
+export interface ReferencedGoalDTO {
+	id: number;
+	referencedGoalContent: string;
+}
+
 export interface PostDTO {
 	id: number;
 	author: UserDTO;
 	content: string;
 	createdAt: string;
-	referencedGoalId?: number;
+	referencedGoal?: ReferencedGoalDTO;
 	isProgressUpdate: boolean;
 	reactions: ReactionDTO[] | null;
 	commentCount: number | null;
