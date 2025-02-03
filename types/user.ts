@@ -37,3 +37,16 @@ export interface UserProfileDTO {
 	areFriends: boolean;
 	friendRequestPending: boolean;
 }
+
+interface AuthData {
+	token: string;
+	refreshToken: string;
+	userId: number;
+	username: string;
+	firstName?: string;
+	lastName?: string;
+}
+
+export interface AuthResponseDTO {
+	auth: AuthData;
+}

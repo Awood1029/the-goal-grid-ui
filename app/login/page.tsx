@@ -37,13 +37,12 @@ export default function LoginPage() {
 
 		try {
 			const result = await login(formData);
-			if (result?.token) {
-				await updateAuthContext(result.token, {
-					id: result.id,
-					userId: result.userId,
-					username: result.username,
-					firstName: result.firstName,
-					lastName: result.lastName,
+			if (result?.auth?.token && result?.auth?.refreshToken) {
+				await updateAuthContext(result.auth.token, result.auth.refreshToken, {
+					userId: result.auth.userId,
+					username: result.auth.username,
+					firstName: result.auth.firstName,
+					lastName: result.auth.lastName,
 				});
 			} else {
 				setLocalError("Invalid login response");

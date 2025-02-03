@@ -26,4 +26,21 @@ export const authService = {
 			lastName,
 		});
 	},
+
+	refreshToken: async (refreshToken: string): Promise<AuthResponseDTO> => {
+		const response = await apiClient.post(
+			"/api/auth/refresh",
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${refreshToken}`,
+				},
+			}
+		);
+		return response.data;
+	},
+
+	logout: async (): Promise<void> => {
+		await apiClient.post("/api/auth/logout");
+	},
 };
