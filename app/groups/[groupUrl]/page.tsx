@@ -19,6 +19,9 @@ import { UserSelector } from "@/components/UserSelector";
 import { GroupStats } from "@/components/GroupStats";
 import { GroupLeaderboard } from "@/components/GroupLeaderboard";
 import Board from "@/components/Board";
+import { UserLink } from "@/components/social/UserLink";
+import { Feed } from "@/components/social/Feed";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import type { GroupDTO, Board as BoardType, GoalUpdateDTO } from "@/types";
 
 export default function GroupPage() {
@@ -138,6 +141,7 @@ export default function GroupPage() {
 			userBoard?.goals.filter((g) => g.completed).length || 0;
 		return {
 			userId: user.id,
+			user,
 			name: `${user.firstName} ${user.lastName}`,
 			completedGoals,
 			totalGoals: userBoard?.goals.length || 25,
@@ -156,6 +160,7 @@ export default function GroupPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 py-8">
+			<ScrollToTop />
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="text-center space-y-2 mb-8">
 					<h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
@@ -176,8 +181,8 @@ export default function GroupPage() {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-					<div className="lg:col-span-3 space-y-6">
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+					<div className="lg:col-span-8 space-y-6">
 						<GroupStats
 							totalMembers={currentGroup.users.length}
 							totalGoalsCompleted={totalGoalsCompleted}
@@ -195,10 +200,17 @@ export default function GroupPage() {
 							<Card className="p-4 sm:p-6 relative overflow-hidden">
 								<div className="relative">
 									<h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900">
-										{
-											currentGroup.users.find((u) => u.id === selectedUserId)
-												?.firstName
-										}
+										{(() => {
+											const boardUser = currentGroup.users.find(
+												(u) => u.id === selectedUserId
+											);
+											if (!boardUser) {
+												return <span className="font-semibold">Board</span>;
+											}
+											return (
+												<UserLink user={boardUser} className="font-semibold" />
+											);
+										})()}
 										&apos;s Board
 									</h2>
 									<Board
@@ -226,9 +238,22 @@ export default function GroupPage() {
 								</div>
 							)
 						)}
+
+						<div className="mt-8 pt-8 border-t border-gray-200">
+							<h2 className="text-lg sm:text-xl font-semibold mb-6 text-gray-900">
+								Group Activity
+							</h2>
+							<Feed
+								type="group"
+								groupUniqueCode={groupUrl}
+								goals={groupBoards.flatMap((board) => board.goals)}
+								hidePostCreation={true}
+								className="mb-6"
+							/>
+						</div>
 					</div>
 
-					<div className="lg:col-span-1">
+					<div className="lg:col-span-4">
 						<div className="sticky top-6">
 							<GroupLeaderboard entries={leaderboardEntries} />
 						</div>

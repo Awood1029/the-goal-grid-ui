@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { UserCircle } from "lucide-react";
 
 export default function Navbar() {
 	const { user, logout } = useAuth();
@@ -92,10 +93,23 @@ export default function Navbar() {
 									Dashboard
 								</Link>
 								<Link
+									href="/feed"
+									className="text-gray-600 hover:text-purple-600 transition-colors"
+								>
+									Feed
+								</Link>
+								<Link
 									href="/groups"
 									className="text-gray-600 hover:text-purple-600 transition-colors"
 								>
 									Groups
+								</Link>
+								<Link
+									href="/profile/me"
+									className="text-gray-600 hover:text-purple-600 transition-colors flex items-center gap-2"
+								>
+									<UserCircle className="h-5 w-5" />
+									Profile
 								</Link>
 								<button
 									onClick={handleLogout}
@@ -128,11 +142,26 @@ export default function Navbar() {
 									Dashboard
 								</Link>
 								<Link
+									href="/feed"
+									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
+									onClick={() => setIsOpen(false)}
+								>
+									Feed
+								</Link>
+								<Link
 									href="/groups"
 									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors"
 									onClick={() => setIsOpen(false)}
 								>
 									Groups
+								</Link>
+								<Link
+									href="/profile/me"
+									className="block px-3 py-2 rounded-md text-gray-600 hover:text-purple-600 transition-colors flex items-center gap-2"
+									onClick={() => setIsOpen(false)}
+								>
+									<UserCircle className="h-5 w-5" />
+									Profile
 								</Link>
 								<button
 									onClick={handleLogout}

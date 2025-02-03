@@ -28,7 +28,7 @@ export default function RegisterPage() {
 
 		try {
 			const result = await register(formData);
-			login(result.token, {
+			login(result.token, result.refreshToken, {
 				userId: result.userId,
 				username: result.username,
 				firstName: result.firstName,

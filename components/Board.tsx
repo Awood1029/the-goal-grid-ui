@@ -73,23 +73,6 @@ const Board: React.FC<BoardProps> = ({
 		}
 	};
 
-	const handleToggleComplete = async (goalId: number) => {
-		const goal = board.goals.find((g) => g.id === goalId);
-		if (!goal) return;
-
-		try {
-			await onUpdateGoals([
-				{
-					goalId,
-					completed: !goal.completed,
-				},
-			]);
-			setSelectedGoal(null);
-		} catch (error) {
-			console.error("Failed to toggle goal completion:", error);
-		}
-	};
-
 	// Ensure goals are sorted by position before rendering
 	const sortedGoals = [...board.goals].sort((a, b) => a.position - b.position);
 
@@ -107,8 +90,6 @@ const Board: React.FC<BoardProps> = ({
 									description: pendingUpdates[goal.id] ?? goal.description,
 								}}
 								onClick={() => handleCellClick(goal)}
-								onToggleComplete={onToggleComplete} // Pass the function here
-								editMode={editMode}
 							/>
 						))}
 					</div>
@@ -193,9 +174,15 @@ const Board: React.FC<BoardProps> = ({
 								</div>
 								{canEdit && (
 									<Button
-										onClick={() =>
-											selectedGoal && handleToggleComplete(selectedGoal.id)
-										}
+										onClick={async () => {
+											if (selectedGoal) {
+												await onToggleComplete(
+													selectedGoal.id,
+													!selectedGoal.completed
+												);
+												setSelectedGoal(null); // Close the modal after completion
+											}
+										}}
 										className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
 									>
 										{selectedGoal?.completed

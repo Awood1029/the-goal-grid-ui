@@ -1,3 +1,5 @@
+import type { UserDTO } from "./user";
+
 export interface GoalDTO {
 	id: number;
 	description: string;
@@ -26,6 +28,13 @@ export interface BoardDTO {
 
 export interface CreateBoardRequestDTO {
 	boardName: string;
+}
+
+export interface LeaderboardEntry {
+	userId: number;
+	user: UserDTO;
+	completedGoals: number;
+	totalGoals: number;
 }
 
 // Using type aliases instead of empty interfaces
