@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { PostDTO, GoalDTO } from "@/types";
+import type { PostDTO, ReferencedGoalDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import type { SocialError } from "@/types";
 import { cn } from "@/lib/utils";
@@ -34,18 +34,15 @@ interface PostCardProps {
 	onPostUpdated?: (updatedPost: PostDTO) => void;
 	className?: string;
 	currentUserId?: number;
-	referencedGoal?: GoalDTO;
 }
 
-const ReferencedGoal: React.FC<{ goal: GoalDTO }> = ({ goal }) => (
+const ReferencedGoal: React.FC<{ goal: ReferencedGoalDTO }> = ({ goal }) => (
 	<div className="mb-4 p-3 bg-purple-50 border border-purple-100 rounded-lg">
 		<div className="flex items-center gap-2 text-sm text-purple-700 mb-1">
 			<Target className="h-4 w-4" />
 			<span className="font-medium">Referenced Goal</span>
 		</div>
-		<p className="text-sm text-purple-900">
-			{goal.description || "No description available"}
-		</p>
+		<p className="text-sm text-purple-900">{goal.referencedGoalContent}</p>
 	</div>
 );
 
@@ -57,7 +54,6 @@ export const PostCard: React.FC<PostCardProps> = ({
 	onPostUpdated,
 	className,
 	currentUserId,
-	referencedGoal,
 }) => {
 	const [localPost, setLocalPost] = useState(post);
 	const [isEditing, setIsEditing] = useState(false);
@@ -175,7 +171,9 @@ export const PostCard: React.FC<PostCardProps> = ({
 				)}
 			</CardHeader>
 			<CardContent>
-				{referencedGoal && <ReferencedGoal goal={referencedGoal} />}
+				{localPost.referencedGoal && (
+					<ReferencedGoal goal={localPost.referencedGoal} />
+				)}
 				{isEditing ? (
 					<div className="space-y-2">
 						<Textarea

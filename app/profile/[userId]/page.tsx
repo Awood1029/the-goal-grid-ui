@@ -87,7 +87,10 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 	}, [toast]);
 
 	useEffect(() => {
-		if (currentUser && (userId === "me" || currentUser.id === Number(userId))) {
+		if (
+			currentUser &&
+			(userId === "me" || currentUser.userId === Number(userId))
+		) {
 			fetchPendingRequests();
 		}
 	}, [currentUser, userId, fetchPendingRequests]);
@@ -208,7 +211,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 			? `${profile.firstName} ${profile.lastName}`
 			: profile.username;
 
-	const isCurrentUser = currentUser?.id === profile.id || userId === "me";
+	const isCurrentUser = currentUser?.userId === profile.id || userId === "me";
 	const isFriend = profile.areFriends;
 	const hasPendingRequest = profile.friendRequestPending;
 

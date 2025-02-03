@@ -42,27 +42,15 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 
 	const handleSubmit = async () => {
 		if (!content.trim() || !selectedGoalId || isSubmitting) {
-			console.log("Validation failed:", {
-				content,
-				selectedGoalId,
-				isSubmitting,
-			});
 			return;
 		}
 
 		setIsSubmitting(true);
 		try {
-			// Convert selectedGoalId to number and ensure it's not NaN
 			const goalId = parseInt(selectedGoalId);
 			if (isNaN(goalId)) {
 				throw new Error("Invalid goal ID");
 			}
-
-			console.log("Creating post with:", {
-				content,
-				referencedGoalId: goalId,
-				isProgressUpdate,
-			});
 
 			const response = await socialService.createPost(
 				content,
@@ -70,10 +58,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 				isProgressUpdate
 			);
 
-			console.log("Post created:", response);
-
 			if (!response.referencedGoal) {
-				console.warn("Post created but referencedGoal is null");
 				toast({
 					title: "Warning",
 					description:
@@ -86,8 +71,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 			setIsProgressUpdate(false);
 			if (!preselectedGoalId) setSelectedGoalId("");
 			onPostCreated?.();
-		} catch (error) {
-			console.error("Error creating post:", error);
+		} catch {
 			toast({
 				title: "Error",
 				description: "Failed to create post. Please try again.",
