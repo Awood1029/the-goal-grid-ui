@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import type { PostDTO, CommentDTO, ReactionDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import { useToast } from "@/hooks/use-toast";
 import { ReactionSection } from "./ReactionSection";
 import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
+import { formatRelativeTime } from "@/lib/utils";
 
 export interface CommentSectionProps {
 	post: PostDTO;
@@ -90,9 +90,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 						</Link>
 					</div>
 					<div className="text-sm text-gray-500">
-						{formatDistanceToNow(new Date(comment.createdAt), {
-							addSuffix: true,
-						})}
+						{formatRelativeTime(comment.createdAt)}
 					</div>
 				</div>
 				<p className="text-gray-700">{comment.content}</p>

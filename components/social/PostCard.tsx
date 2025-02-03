@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import type { PostDTO, ReferencedGoalDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import type { SocialError } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, formatRelativeTime } from "@/lib/utils";
 import { CommentSection } from "./CommentSection";
 import { ReactionSection } from "./ReactionSection";
 import {
@@ -135,9 +134,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 							{authorName}
 						</Link>
 						<div className="text-sm text-gray-500">
-							{formatDistanceToNow(new Date(localPost.createdAt), {
-								addSuffix: true,
-							})}
+							{formatRelativeTime(localPost.createdAt)}
 						</div>
 					</div>
 					{isAuthor && (
