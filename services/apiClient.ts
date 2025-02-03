@@ -102,7 +102,7 @@ apiClient.interceptors.response.use(
 			}
 
 			const response = await authService.refreshToken(refreshToken);
-			const { token: newToken, refreshToken: newRefreshToken } = response.auth;
+			const { token: newToken, refreshToken: newRefreshToken } = response;
 
 			// Update tokens in localStorage and cookie
 			localStorage.setItem("token", newToken);

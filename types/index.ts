@@ -1,10 +1,9 @@
-export * from "./auth";
 export * from "./user";
 export * from "./board";
 export * from "./group";
-export * from "./leaderboard";
 export * from "./props";
 export * from "./social";
+export type { AuthResponseDTO } from "./auth";
 
 export interface LeaderboardEntry {
 	userId: number;

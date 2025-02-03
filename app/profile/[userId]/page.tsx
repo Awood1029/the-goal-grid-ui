@@ -307,7 +307,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 					<CardHeader>
 						<div className="flex items-center gap-2">
 							<Trophy className="h-5 w-5 text-yellow-500" />
-							<h2 className="text-lg font-semibold">Recent Achievement</h2>
+							<h2 className="text-lg font-semibold">Recent Goal Completed</h2>
 						</div>
 					</CardHeader>
 					<CardContent>
@@ -318,7 +318,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 								</p>
 							</div>
 						) : (
-							<p className="text-gray-500">No recent achievements</p>
+							<p className="text-gray-500">No recent goals completed</p>
 						)}
 					</CardContent>
 				</Card>

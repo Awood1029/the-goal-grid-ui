@@ -37,17 +37,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		const storedUser = localStorage.getItem("user");
 
 		if (storedToken && storedRefreshToken && storedUser) {
-			setToken(storedToken);
-			setRefreshToken(storedRefreshToken);
-			setUser(JSON.parse(storedUser));
+			try {
+				const parsedUser = JSON.parse(storedUser);
+				if (parsedUser && typeof parsedUser === "object") {
+					setToken(storedToken);
+					setRefreshToken(storedRefreshToken);
+					setUser(parsedUser);
 
-			if (!Cookies.get("token")) {
-				Cookies.set("token", storedToken, {
-					expires: 1, // 24 hours
-					sameSite: "Lax",
-					secure: process.env.NODE_ENV === "production",
-					path: "/",
-				});
+					if (!Cookies.get("token")) {
+						Cookies.set("token", storedToken, {
+							expires: 1, // 24 hours
+							sameSite: "Lax",
+							secure: process.env.NODE_ENV === "production",
+							path: "/",
+						});
+					}
+				} else {
+					// Invalid user data, clear storage
+					localStorage.removeItem("token");
+					localStorage.removeItem("refreshToken");
+					localStorage.removeItem("user");
+					Cookies.remove("token");
+				}
+			} catch (error) {
+				console.error("Error parsing stored user data:", error);
+				// Clear invalid data from storage
+				localStorage.removeItem("token");
+				localStorage.removeItem("refreshToken");
+				localStorage.removeItem("user");
+				Cookies.remove("token");
 			}
 		}
 		setIsInitialized(true);

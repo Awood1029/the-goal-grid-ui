@@ -50,7 +50,10 @@ export const GroupLeaderboard: React.FC<GroupLeaderboardProps> = ({
 								</span>
 								<div>
 									<div className="font-medium text-sm sm:text-base">
-										<UserLink user={entry.user} className="font-medium" />
+										<UserLink
+											user={{ id: entry.userId, username: entry.name }}
+											className="font-medium"
+										/>
 									</div>
 									<div className="text-xs sm:text-sm text-gray-600">
 										{entry.completedGoals}/{entry.totalGoals} goals

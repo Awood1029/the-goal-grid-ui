@@ -84,9 +84,6 @@ export const Feed: React.FC<FeedProps> = ({
 			)}
 			<div className="space-y-6">
 				{posts.map((post, index) => {
-					const referencedGoal = goals.find(
-						(goal) => goal.id === post.referencedGoal?.id
-					);
 					const isLastPost = index === posts.length - 1;
 
 					return (
@@ -97,7 +94,6 @@ export const Feed: React.FC<FeedProps> = ({
 								onReactionAdded={handlePostUpdated}
 								onPostDeleted={() => loadPosts(0)}
 								onPostUpdated={handlePostUpdated}
-								referencedGoal={referencedGoal}
 								currentUserId={user?.userId}
 							/>
 						</div>
