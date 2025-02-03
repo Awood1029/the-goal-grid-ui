@@ -139,7 +139,7 @@ export default function GroupPage() {
 			userBoard?.goals.filter((g) => g.completed).length || 0;
 		return {
 			userId: user.id,
-			user: user,
+			name: `${user.firstName} ${user.lastName}`,
 			completedGoals,
 			totalGoals: userBoard?.goals.length || 25,
 		};

@@ -99,6 +99,21 @@ class FriendService {
 			throw error;
 		}
 	}
+
+	async removeFriend(friendId: number): Promise<void> {
+		try {
+			await apiClient.post(`/friends/remove/${friendId}`);
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				throw new Error(
+					`Failed to remove friend: ${
+						error.response?.data?.message || error.message
+					}`
+				);
+			}
+			throw error;
+		}
+	}
 }
 
 export const friendService = new FriendService();

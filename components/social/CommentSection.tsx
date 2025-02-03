@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
@@ -152,7 +152,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 		}
 	};
 
-	const loadComments = async () => {
+	const loadComments = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			const fetchedComments = await socialService.getAllCommentsForPost(
@@ -171,7 +171,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [post.id, toast]);
 
 	const handleSubmitComment = async (content: string) => {
 		const comment = await socialService.createComment(post.id, content);
@@ -183,7 +183,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 		if (isExpanded) {
 			loadComments();
 		}
-	}, [isExpanded, post.id]);
+	}, [isExpanded, post.id, loadComments]);
 
 	return (
 		<div className="w-full">

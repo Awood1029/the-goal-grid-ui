@@ -34,4 +34,6 @@ export interface UserProfileDTO {
 	totalCompletedGoals: number;
 	recentPosts: PostDTO[];
 	pendingRequests: FriendRequestDTO[];
+	areFriends: boolean;
+	friendRequestPending: boolean;
 }

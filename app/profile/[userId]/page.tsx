@@ -19,7 +19,7 @@ import { use } from "react";
 import { PostCard } from "@/components/social/PostCard";
 import Board from "@/components/Board";
 import { FriendRequestCard } from "@/components/social/FriendRequestCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { friendService } from "@/services/friendService";
 import { FriendRequestDTO } from "@/types/user";
 import { PostDTO } from "@/types/social";
@@ -69,8 +69,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 		}
 	};
 
-	const fetchPendingRequests = async () => {
-		if (!currentUser) return;
+	const fetchPendingRequests = useCallback(async () => {
 		try {
 			setLoadingRequests(true);
 			const requests = await friendService.getPendingFriendRequests();
@@ -85,13 +84,13 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 		} finally {
 			setLoadingRequests(false);
 		}
-	};
+	}, [toast]);
 
 	useEffect(() => {
 		if (currentUser && (userId === "me" || currentUser.id === Number(userId))) {
 			fetchPendingRequests();
 		}
-	}, [currentUser, userId]);
+	}, [currentUser, userId, fetchPendingRequests]);
 
 	const handleAcceptRequest = async (requestId: number) => {
 		try {
@@ -142,12 +141,21 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 	};
 
 	const handleRemoveFriend = async () => {
-		// TODO: Implement remove friend functionality once backend supports it
-		toast({
-			title: "Not implemented",
-			description: "Remove friend functionality coming soon",
-			variant: "default",
-		});
+		try {
+			if (!profile) return;
+			await friendService.removeFriend(profile.id);
+			await refreshProfile();
+			toast({
+				description: "Friend removed successfully",
+			});
+		} catch (err) {
+			console.error("Failed to remove friend:", err);
+			toast({
+				title: "Error",
+				description: "Failed to remove friend",
+				variant: "destructive",
+			});
+		}
 	};
 
 	if (loading) {
@@ -201,18 +209,8 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 			: profile.username;
 
 	const isCurrentUser = currentUser?.id === profile.id || userId === "me";
-	const isFriend = Boolean(
-		currentUser &&
-			profile.friends?.some((friend) => friend.id === currentUser.id)
-	);
-	const hasPendingOutgoingRequest = Boolean(
-		currentUser &&
-			profile.pendingRequests?.some(
-				(request: FriendRequestDTO) =>
-					request.sender.id === currentUser.id &&
-					request.recipient.id === profile.id
-			)
-	);
+	const isFriend = profile.areFriends;
+	const hasPendingRequest = profile.friendRequestPending;
 
 	const renderFriendButton = () => {
 		if (!currentUser || isCurrentUser) return null;
@@ -220,7 +218,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 		if (isFriend) {
 			return (
 				<Button
-					onClick={() => handleRemoveFriend()}
+					onClick={handleRemoveFriend}
 					className="gap-2"
 					variant="outline"
 				>
@@ -230,7 +228,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 			);
 		}
 
-		if (hasPendingOutgoingRequest) {
+		if (hasPendingRequest) {
 			return (
 				<Button className="gap-2" variant="outline" disabled>
 					<Clock className="h-4 w-4" />
