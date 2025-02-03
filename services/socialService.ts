@@ -59,13 +59,24 @@ export const socialService = {
 		isProgressUpdate: boolean = false
 	): Promise<PostDTO> => {
 		try {
-			const response = await apiClient.post("/posts", {
+			// Create a PostDTO object that matches the backend's expected structure
+			const postData = {
 				content,
-				referencedGoalId,
-				isProgressUpdate,
-			});
+				referencedGoal: referencedGoalId
+					? {
+							id: referencedGoalId,
+							referencedGoalContent: "", // The backend will populate this
+					  }
+					: null,
+				progressUpdate: isProgressUpdate,
+			};
+
+			console.log("Sending post data:", postData);
+
+			const response = await apiClient.post("/posts", postData);
 			return response.data;
 		} catch (error) {
+			console.error("Error in createPost:", error);
 			throw handleApiError(error);
 		}
 	},

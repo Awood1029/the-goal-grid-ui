@@ -17,6 +17,7 @@ import { Trophy, Target } from "lucide-react";
 import { socialService } from "@/services/socialService";
 import type { GoalDTO } from "@/types";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface CreatePostFormProps {
 	goals?: GoalDTO[];
@@ -37,23 +38,61 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 		preselectedGoalId?.toString() || ""
 	);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { toast } = useToast();
 
 	const handleSubmit = async () => {
-		if (!content.trim() || !selectedGoalId || isSubmitting) return;
+		if (!content.trim() || !selectedGoalId || isSubmitting) {
+			console.log("Validation failed:", {
+				content,
+				selectedGoalId,
+				isSubmitting,
+			});
+			return;
+		}
 
 		setIsSubmitting(true);
 		try {
-			await socialService.createPost(
+			// Convert selectedGoalId to number and ensure it's not NaN
+			const goalId = parseInt(selectedGoalId);
+			if (isNaN(goalId)) {
+				throw new Error("Invalid goal ID");
+			}
+
+			console.log("Creating post with:", {
 				content,
-				parseInt(selectedGoalId),
+				referencedGoalId: goalId,
+				isProgressUpdate,
+			});
+
+			const response = await socialService.createPost(
+				content,
+				goalId,
 				isProgressUpdate
 			);
+
+			console.log("Post created:", response);
+
+			if (!response.referencedGoal) {
+				console.warn("Post created but referencedGoal is null");
+				toast({
+					title: "Warning",
+					description:
+						"Post was created but goal reference might not have been saved",
+					variant: "destructive",
+				});
+			}
+
 			setContent("");
 			setIsProgressUpdate(false);
 			if (!preselectedGoalId) setSelectedGoalId("");
 			onPostCreated?.();
 		} catch (error) {
 			console.error("Error creating post:", error);
+			toast({
+				title: "Error",
+				description: "Failed to create post. Please try again.",
+				variant: "destructive",
+			});
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -62,6 +101,9 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 	const selectedGoal = goals.find(
 		(goal) => goal.id.toString() === selectedGoalId
 	);
+
+	// Sort goals by position
+	const sortedGoals = [...goals].sort((a, b) => a.position - b.position);
 
 	return (
 		<Card className={cn("w-full", className)}>
@@ -97,9 +139,9 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 								<SelectValue placeholder="Select a goal" />
 							</SelectTrigger>
 							<SelectContent>
-								{goals.map((goal) => (
+								{sortedGoals.map((goal) => (
 									<SelectItem key={goal.id} value={goal.id.toString()}>
-										{goal.description}
+										{`Goal ${goal.position + 1}: ${goal.description}`}
 									</SelectItem>
 								))}
 							</SelectContent>
