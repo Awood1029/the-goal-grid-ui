@@ -125,7 +125,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
 							<SelectContent>
 								{sortedGoals.map((goal) => (
 									<SelectItem key={goal.id} value={goal.id.toString()}>
-										{`Goal ${goal.position + 1}: ${goal.description}`}
+										{`Goal ${goal.position}: ${goal.description}`}
 									</SelectItem>
 								))}
 							</SelectContent>
