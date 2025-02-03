@@ -48,6 +48,7 @@ export interface FeedProps {
 	goalId?: number;
 	goals?: GoalDTO[];
 	className?: string;
+	hidePostCreation?: boolean;
 }
 
 export interface PaginatedResponse<T> {

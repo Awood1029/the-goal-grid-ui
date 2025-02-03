@@ -41,6 +41,7 @@ export const Feed: React.FC<FeedProps> = ({
 	goalId,
 	goals = [],
 	className,
+	hidePostCreation = false,
 }) => {
 	const {
 		posts,
@@ -73,12 +74,14 @@ export const Feed: React.FC<FeedProps> = ({
 
 	return (
 		<div className={cn("w-full", className)}>
-			<CreatePostForm
-				goals={goals}
-				onPostCreated={() => loadPosts(0)}
-				className="mb-6"
-				preselectedGoalId={goalId}
-			/>
+			{!hidePostCreation && (
+				<CreatePostForm
+					goals={goals}
+					onPostCreated={() => loadPosts(0)}
+					className="mb-6"
+					preselectedGoalId={goalId}
+				/>
+			)}
 			<div className="space-y-6">
 				{posts.map((post, index) => {
 					const referencedGoal = goals.find(
