@@ -19,6 +19,7 @@ import { UserSelector } from "@/components/UserSelector";
 import { GroupStats } from "@/components/GroupStats";
 import { GroupLeaderboard } from "@/components/GroupLeaderboard";
 import Board from "@/components/Board";
+import { UserLink } from "@/components/social/UserLink";
 import type { GroupDTO, Board as BoardType, GoalUpdateDTO } from "@/types";
 
 export default function GroupPage() {
@@ -138,7 +139,7 @@ export default function GroupPage() {
 			userBoard?.goals.filter((g) => g.completed).length || 0;
 		return {
 			userId: user.id,
-			name: `${user.firstName} ${user.lastName}`,
+			user: user,
 			completedGoals,
 			totalGoals: userBoard?.goals.length || 25,
 		};
@@ -195,10 +196,12 @@ export default function GroupPage() {
 							<Card className="p-4 sm:p-6 relative overflow-hidden">
 								<div className="relative">
 									<h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900">
-										{
-											currentGroup.users.find((u) => u.id === selectedUserId)
-												?.firstName
-										}
+										<UserLink
+											user={
+												currentGroup.users.find((u) => u.id === selectedUserId)!
+											}
+											className="font-semibold"
+										/>
 										&apos;s Board
 									</h2>
 									<Board

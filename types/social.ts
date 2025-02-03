@@ -6,20 +6,20 @@ export enum ReactionType {
 	LOVE = "LOVE",
 	LAUGH = "LAUGH",
 	CELEBRATE = "CELEBRATE",
+	HIGH_FIVE = "HIGH_FIVE",
 }
 
 export interface ReactionDTO {
 	id: number;
 	type: ReactionType;
-	user?: UserDTO;
-	createdAt?: string;
+	user: UserDTO;
 }
 
 export interface CommentDTO {
 	id: number;
+	content: string;
 	authorId: UserDTO;
 	postId: number;
-	content: string;
 	createdAt: string;
 	reactions: ReactionDTO[];
 }
@@ -31,13 +31,13 @@ export interface ReferencedGoalDTO {
 
 export interface PostDTO {
 	id: number;
-	author: UserDTO;
 	content: string;
+	author: UserDTO;
 	createdAt: string;
+	reactions: ReactionDTO[];
+	commentCount: number;
 	referencedGoal?: ReferencedGoalDTO;
-	isProgressUpdate: boolean;
-	reactions: ReactionDTO[] | null;
-	commentCount: number | null;
+	progressUpdate: boolean;
 }
 
 export type FeedType = "main" | "group" | "goal";

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { PostDTO } from "@/types";
+import type { PostDTO, GoalDTO } from "@/types";
 import { socialService } from "@/services/socialService";
 import type { SocialError } from "@/types";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface PostCardProps {
 	post: PostDTO;
@@ -33,7 +34,20 @@ interface PostCardProps {
 	onPostUpdated?: (updatedPost: PostDTO) => void;
 	className?: string;
 	currentUserId?: number;
+	referencedGoal?: GoalDTO;
 }
+
+const ReferencedGoal: React.FC<{ goal: GoalDTO }> = ({ goal }) => (
+	<div className="mb-4 p-3 bg-purple-50 border border-purple-100 rounded-lg">
+		<div className="flex items-center gap-2 text-sm text-purple-700 mb-1">
+			<Target className="h-4 w-4" />
+			<span className="font-medium">Referenced Goal</span>
+		</div>
+		<p className="text-sm text-purple-900">
+			{goal.description || "No description available"}
+		</p>
+	</div>
+);
 
 export const PostCard: React.FC<PostCardProps> = ({
 	post,
@@ -43,6 +57,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 	onPostUpdated,
 	className,
 	currentUserId,
+	referencedGoal,
 }) => {
 	const [localPost, setLocalPost] = useState(post);
 	const [isEditing, setIsEditing] = useState(false);
@@ -87,7 +102,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 			const updatedPost = await socialService.updatePost(
 				post.id,
 				editContent,
-				localPost.isProgressUpdate
+				localPost.progressUpdate
 			);
 			setLocalPost(updatedPost);
 			onPostUpdated?.(updatedPost);
@@ -117,7 +132,12 @@ export const PostCard: React.FC<PostCardProps> = ({
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
-						<div className="font-semibold">{authorName}</div>
+						<Link
+							href={`/profile/${localPost.author.id}`}
+							className="font-semibold hover:text-purple-600 hover:underline"
+						>
+							{authorName}
+						</Link>
 						<div className="text-sm text-gray-500">
 							{formatDistanceToNow(new Date(localPost.createdAt), {
 								addSuffix: true,
@@ -147,7 +167,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 						</DropdownMenu>
 					)}
 				</div>
-				{localPost.isProgressUpdate && (
+				{localPost.progressUpdate && (
 					<div className="flex items-center gap-1 text-sm text-yellow-600">
 						<Trophy className="h-4 w-4" />
 						Progress Update
@@ -155,17 +175,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 				)}
 			</CardHeader>
 			<CardContent>
-				{localPost.referencedGoal && (
-					<div className="mb-4 p-3 bg-purple-50 border border-purple-100 rounded-lg">
-						<div className="flex items-center gap-2 text-sm text-purple-700 mb-1">
-							<Target className="h-4 w-4" />
-							<span className="font-medium">Referenced Goal</span>
-						</div>
-						<p className="text-sm text-purple-900">
-							{localPost.referencedGoal.referencedGoalContent}
-						</p>
-					</div>
-				)}
+				{referencedGoal && <ReferencedGoal goal={referencedGoal} />}
 				{isEditing ? (
 					<div className="space-y-2">
 						<Textarea

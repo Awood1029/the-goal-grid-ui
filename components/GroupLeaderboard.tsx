@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy } from "lucide-react";
 import type { LeaderboardEntry } from "@/types";
 import { cn } from "@/lib/utils";
+import { UserLink } from "@/components/social/UserLink";
 
 interface GroupLeaderboardProps {
 	entries: LeaderboardEntry[];
@@ -49,7 +50,7 @@ export const GroupLeaderboard: React.FC<GroupLeaderboardProps> = ({
 								</span>
 								<div>
 									<div className="font-medium text-sm sm:text-base">
-										{entry.name}
+										<UserLink user={entry.user} className="font-medium" />
 									</div>
 									<div className="text-xs sm:text-sm text-gray-600">
 										{entry.completedGoals}/{entry.totalGoals} goals

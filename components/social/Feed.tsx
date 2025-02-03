@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React from "react";
 import { PostCard } from "./PostCard";
 import { CreatePostForm } from "./CreatePostForm";
 import { useFeed } from "@/hooks/useFeed";
@@ -9,6 +9,31 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { Spinner } from "@/components/ui/spinner";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { cn } from "@/lib/utils";
+
+const EmptyFeed = () => (
+	<div className="text-center py-8 text-gray-500">
+		No posts yet. Be the first to share something!
+	</div>
+);
+
+const FeedError = ({
+	error,
+	onRetry,
+}: {
+	error: string;
+	onRetry: () => void;
+}) => (
+	<Alert variant="destructive" className="my-4">
+		<AlertCircle className="h-4 w-4" />
+		<AlertDescription>{error}</AlertDescription>
+		<Button variant="outline" size="sm" onClick={onRetry} className="mt-2">
+			Try Again
+		</Button>
+	</Alert>
+);
 
 export const Feed: React.FC<FeedProps> = ({
 	type,
@@ -31,62 +56,23 @@ export const Feed: React.FC<FeedProps> = ({
 		goalId,
 	});
 	const { user } = useAuth();
-	const observerRef = useRef<IntersectionObserver | null>(null);
-	const loadingRef = useRef<HTMLDivElement>(null);
 
-	const lastPostRef = useCallback(
-		(node: HTMLDivElement) => {
-			if (isLoading) return;
-
-			if (observerRef.current) {
-				observerRef.current.disconnect();
-			}
-
-			observerRef.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting && hasMore) {
-					loadMore();
-				}
-			});
-
-			if (node) {
-				observerRef.current.observe(node);
-			}
-		},
-		[isLoading, hasMore, loadMore]
-	);
-
-	useEffect(() => {
-		return () => {
-			if (observerRef.current) {
-				observerRef.current.disconnect();
-			}
-		};
-	}, []);
+	const { lastElementRef } = useInfiniteScroll({
+		isLoading,
+		hasMore,
+		onLoadMore: loadMore,
+	});
 
 	const handlePostUpdated = (updatedPost: PostDTO) => {
-		// Update the feed state with the updated post
 		handleCommentAdded(updatedPost);
 	};
 
 	if (error) {
-		return (
-			<Alert variant="destructive" className="my-4">
-				<AlertCircle className="h-4 w-4" />
-				<AlertDescription>{error}</AlertDescription>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => loadPosts(0)}
-					className="mt-2"
-				>
-					Try Again
-				</Button>
-			</Alert>
-		);
+		return <FeedError error={error} onRetry={() => loadPosts(0)} />;
 	}
 
 	return (
-		<div className={className}>
+		<div className={cn("w-full", className)}>
 			<CreatePostForm
 				goals={goals}
 				onPostCreated={() => loadPosts(0)}
@@ -96,12 +82,12 @@ export const Feed: React.FC<FeedProps> = ({
 			<div className="space-y-6">
 				{posts.map((post, index) => {
 					const referencedGoal = goals.find(
-						(goal) => goal.id === post.referencedGoalId
+						(goal) => goal.id === post.referencedGoal?.id
 					);
 					const isLastPost = index === posts.length - 1;
 
 					return (
-						<div key={post.id} ref={isLastPost ? lastPostRef : undefined}>
+						<div key={post.id} ref={isLastPost ? lastElementRef : undefined}>
 							<PostCard
 								post={post}
 								onCommentAdded={handleCommentAdded}
@@ -115,15 +101,11 @@ export const Feed: React.FC<FeedProps> = ({
 					);
 				})}
 				{isLoading && (
-					<div ref={loadingRef} className="w-full flex justify-center py-8">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+					<div className="w-full flex justify-center py-8">
+						<Spinner size="lg" />
 					</div>
 				)}
-				{!isLoading && posts.length === 0 && (
-					<div className="text-center py-8 text-gray-500">
-						No posts yet. Be the first to share something!
-					</div>
-				)}
+				{!isLoading && posts.length === 0 && <EmptyFeed />}
 			</div>
 		</div>
 	);

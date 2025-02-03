@@ -1,17 +1,20 @@
-import { UserDTO } from "./user";
-import { Board } from "./board";
+import type { UserDTO } from "./user";
+import type { BoardDTO } from "./board";
+
+export interface GroupMemberDTO extends UserDTO {
+	board: BoardDTO;
+	joinedAt: string;
+}
 
 export interface GroupDTO {
 	id: number;
 	name: string;
+	description: string;
 	uniqueUrl: string;
 	inviteCode: string;
-	users: UserDTO[];
-	leaderboard: Record<string, number>;
-}
-
-export interface Group extends Omit<GroupDTO, "leaderboard"> {
-	ownerId: number;
 	createdAt: string;
-	boards: Board[];
+	updatedAt: string;
+	members: GroupMemberDTO[];
+	admins: GroupMemberDTO[];
+	users: UserDTO[];
 }
