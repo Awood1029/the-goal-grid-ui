@@ -39,6 +39,7 @@ export default function LoginPage() {
 			const result = await login(formData);
 			if (result?.token) {
 				await updateAuthContext(result.token, {
+					id: result.id,
 					userId: result.userId,
 					username: result.username,
 					firstName: result.firstName,
